@@ -22,6 +22,8 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
+import com.jpiva.controller.ImprimeContrato;
+import com.jpiva.controller.MontarContrato;
 import com.jpiva.model.Cliente;
 import com.jpiva.model.Contrato;
 
@@ -33,8 +35,11 @@ public class AcademiaLayout extends JFrame{
 	JPanel painelControle = new JPanel();
 	JPanel painelContrato = new JPanel();
 	
+	ImprimeContrato ic = new ImprimeContrato();
+	MontarContrato mc = new MontarContrato();
 	
 	JButton btnSalvar = new JButton("Salvar");
+	JButton btnImprimir = new JButton("Imprimir");
 	
 	// campos clientes
 	JLabel lAluno = new JLabel("Aluno:");
@@ -164,6 +169,23 @@ public class AcademiaLayout extends JFrame{
 		painelContrato.setLayout(new FlowLayout(FlowLayout.LEFT));
 		painelControle.setLayout(new FlowLayout(FlowLayout.CENTER));
 		
+		//valores de teste
+		txtAluno.setText("Rodrigo Sodré Piva Junior");
+		txtRepresentante.setText("Rodrigo Sodré Piva");
+		txtAltura.setText("1.79");
+		txtPeso.setText("087.5");
+		txtIdade.setText("30");
+		
+		txtValorParcela.setText("100.00");
+		txtDiaDePagto.setText("30");
+		txtDtNascimento.setText("28/05/1983");
+		txtLimiteAulas.setText("12");
+		txtLimiteSemanais.setText("3");
+		txtQtdMesesPlano.setText("12");
+		txtQtdParcela.setText("12");
+		
+		
+		
 		lAluno.setLabelFor(txtAluno);
 		txtAluno.addFocusListener(painter);
 		painelCliente.add(lAluno);
@@ -290,12 +312,17 @@ public class AcademiaLayout extends JFrame{
 		txtValorParcela.setFormatterFactory(MascaraMonetario("#,###,###.00")); 
 		txtValorParcela.setHorizontalAlignment(JTextField.TRAILING);
 		
+		
+		
+		
 		painelContrato.add(lValorParcela);
 		painelContrato.add(txtValorParcela);
 		
 		
 		
 		painelControle.add(btnSalvar);
+		painelControle.add(btnImprimir);
+		btnImprimir.addActionListener(new ImprimirContrato());
 		btnSalvar.addActionListener(new SalvarContrato());
 		
 				
@@ -308,60 +335,56 @@ public class AcademiaLayout extends JFrame{
 		
 	}
 	
+	private Contrato lerFormulario(){
 		
-	
-    class SalvarContrato implements ActionListener{
-		
-		public void actionPerformed(ActionEvent e){
-			
-			Cliente c = new Cliente();
-			Contrato cto = new Contrato();
-			c.setAluno(txtAluno.getText());
-			c.setRepresentante(txtRepresentante.getText());
-			c.setEndereco(txtEndereco.getText());
-			c.setNumero(txtNumero.getText());
-			c.setComplemento(txtComplemento.getText());
-			c.setBairro(txtBairro.getText());
-			c.setCidade(txtCidade.getText());
-			c.setCep(txtCep.getText());
-			c.setFone1(txtFone1.getText());
-			c.setFone2(txtFone2.getText());
-			c.setIdade(Integer.parseInt(txtIdade.getText()));
-			c.setLocalNascimento(txtLocalNascimento.getText());
-						
-			SimpleDateFormat sdf1= new SimpleDateFormat("dd/MM/yyyy");
-			try {
-				c.setDtNascimento(sdf1.parse(txtDtNascimento.getText()));
-			} catch (ParseException e1) {
-				JOptionPane.showMessageDialog(null, "Data esta incorreta");
-				e1.printStackTrace();
-			}
-			c.setPeso(Double.parseDouble(txtPeso.getText()));
-			c.setAltura(Double.parseDouble(txtAltura.getText()));
-			c.setEscolaridade(txtEscolaridade.getText());
-			c.setProfissao(txtProfissao.getText());
-			c.setLocalTrabalho(txtLocalTrabalho.getText());
-			c.setEnderecoTrabalho(txtEnderecoTrab.getText());
-			c.setNumeroTrabalho(txtNumeroTrab.getText());
-			c.setRg(txtRg.getText());
-			c.setCpf(txtCpf.getText());
-			c.setNomePai(txtPai.getText());
-			c.setNomeMae(txtMae.getText());
-			
-			//campos do contrato
-			cto.setCliente(c);
-			cto.setLimiteDeAulas(Integer.parseInt(txtLimiteAulas.getText()));
-			cto.setLimiteDeAulasSemanais(Integer.parseInt(txtLimiteSemanais.getText()));
-			cto.setDiaDePagto(Integer.parseInt(txtDiaDePagto.getText()));
-			cto.setQtdMesesPlano(Integer.parseInt(txtQtdMesesPlano.getText()));
-			cto.setQtdParcela(Integer.parseInt(txtQtdParcela.getText()));
-			cto.setValorParcela(new BigDecimal(0.0));
-						
-			JOptionPane.showMessageDialog(null, "Seu nome não é " + c.getAluno());
-			JOptionPane.showMessageDialog(null, "contrato " + cto.getQtdMesesPlano());
-			
+		Cliente c = new Cliente();
+		Contrato cto = new Contrato();
+		c.setAluno(txtAluno.getText());
+		c.setRepresentante(txtRepresentante.getText());
+		c.setEndereco(txtEndereco.getText());
+		c.setNumero(txtNumero.getText());
+		c.setComplemento(txtComplemento.getText());
+		c.setBairro(txtBairro.getText());
+		c.setCidade(txtCidade.getText());
+		c.setCep(txtCep.getText());
+		c.setFone1(txtFone1.getText());
+		c.setFone2(txtFone2.getText());
+		c.setIdade(Integer.parseInt(txtIdade.getText()));
+		c.setLocalNascimento(txtLocalNascimento.getText());
+					
+		SimpleDateFormat sdf1= new SimpleDateFormat("dd/MM/yyyy");
+		try {
+			c.setDtNascimento(sdf1.parse(txtDtNascimento.getText()));
+		} catch (ParseException e1) {
+			JOptionPane.showMessageDialog(null, "Data esta incorreta");
+			e1.printStackTrace();
 		}
-    }
+		c.setPeso(Double.parseDouble(txtPeso.getText()));
+		c.setAltura(Double.parseDouble(txtAltura.getText()));
+		c.setEscolaridade(txtEscolaridade.getText());
+		c.setProfissao(txtProfissao.getText());
+		c.setLocalTrabalho(txtLocalTrabalho.getText());
+		c.setEnderecoTrabalho(txtEnderecoTrab.getText());
+		c.setNumeroTrabalho(txtNumeroTrab.getText());
+		c.setRg(txtRg.getText());
+		c.setCpf(txtCpf.getText());
+		c.setNomePai(txtPai.getText());
+		c.setNomeMae(txtMae.getText());
+		
+		//campos do contrato
+		cto.setCliente(c);
+		cto.setLimiteDeAulas(Integer.parseInt(txtLimiteAulas.getText()));
+		cto.setLimiteDeAulasSemanais(Integer.parseInt(txtLimiteSemanais.getText()));
+		cto.setDiaDePagto(Integer.parseInt(txtDiaDePagto.getText()));
+		cto.setQtdMesesPlano(Integer.parseInt(txtQtdMesesPlano.getText()));
+		cto.setQtdParcela(Integer.parseInt(txtQtdParcela.getText()));
+		cto.setValorParcela(new BigDecimal(0.0));
+					
+		return cto;
+		
+	}
+		
+	   
     
     public MaskFormatter Mascara(String Mascara){  
         
@@ -394,6 +417,30 @@ public class AcademiaLayout extends JFrame{
         F_Mascara.setPlaceholderCharacter('0'); //Caracter para preencimento
         */   
     	return dff;  
-    }   
-   
+    }
+    
+    class SalvarContrato implements ActionListener{
+		
+		public void actionPerformed(ActionEvent e){
+			
+			Contrato cto = new Contrato();
+			cto = lerFormulario();
+			
+		}
+    }
+    
+	class ImprimirContrato implements ActionListener{
+			
+		public void actionPerformed(ActionEvent e){
+			
+			Contrato cto = new Contrato();
+			cto = lerFormulario();
+			
+			ic.setNome("contrato");
+			ic.setConteudoPdf(mc.MontarConteudoContrato(cto));
+			ic.imprimirContratoPdf();
+			
+		}
+    }
+    
 }

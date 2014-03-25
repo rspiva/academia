@@ -1,5 +1,11 @@
 package com.jpiva.aplicativo;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+
+import com.jpiva.controller.ImprimeContrato;
+
 
 public class Academia {
 

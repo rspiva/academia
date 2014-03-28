@@ -437,7 +437,7 @@ public class AcademiaLayout extends JFrame{
 			cto = lerFormulario();
 			
 			ic.setNome("contrato");
-			ic.setConteudoPdf(mc.MontarConteudoContrato(cto));
+			ic.setContrato(cto);
 			ic.imprimirContratoPdf();
 			
 		}

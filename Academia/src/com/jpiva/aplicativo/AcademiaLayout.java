@@ -22,6 +22,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
+import com.jpiva.controller.ClienteController;
 import com.jpiva.controller.ImprimeContrato;
 import com.jpiva.controller.MontarContrato;
 import com.jpiva.model.Cliente;
@@ -31,6 +32,8 @@ import com.jpiva.model.Contrato;
 public class AcademiaLayout extends JFrame{
 	
 	private JFrame frame = this;
+	ClienteController cc = new ClienteController();
+	
 	JPanel painelCliente = new JPanel();
 	JPanel painelControle = new JPanel();
 	JPanel painelContrato = new JPanel();
@@ -425,6 +428,8 @@ public class AcademiaLayout extends JFrame{
 			
 			Contrato cto = new Contrato();
 			cto = lerFormulario();
+			cc.salvaCliente(cto.getCliente());
+			
 			
 		}
     }

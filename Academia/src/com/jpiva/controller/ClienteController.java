@@ -19,8 +19,10 @@ public class ClienteController {
 	
 	private Cliente cliente;
 	private List<Cliente> clientes;
+	
 	Gson gs = new Gson();
 	File arquivo = new File("cliente.json");
+	public List<Cliente> filterList;
 	
 	//leitura de dados com o FileReader e BufferedReader, estudar forma de ler dados com o
 	// FileInputStream			
@@ -36,7 +38,7 @@ public class ClienteController {
         	while ((texto = buffR.readLine ()) != null ) {
         		Cliente cliente = gs.fromJson(texto, Cliente.class);
         		clientes.add(cliente);
-			    System.out.println(cliente.getAluno());  
+			    //System.out.println(cliente.getAluno());  
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -63,12 +65,16 @@ public class ClienteController {
 	
 	public void salvaCliente(Cliente cliente){
 		
+		//Inserir o tratamento de quando houver o cliente atualiza
+		for( int i = 0; i < this.clientes.size(); i++){
+			if(cliente.equals(this.clientes.get(i))){
+				this.clientes.remove(i);
+			}
+		}
 		this.clientes.add(cliente);
 		
 		try {
 			FileOutputStream fos = new FileOutputStream(arquivo);
-			
-			//Inserir o tratamento de quando houver o cliente atualiza
 			
 			for(Cliente c : this.clientes){
 				//adiciona na linha cada json
@@ -90,5 +96,19 @@ public class ClienteController {
 		
 	}
 	
-
+	public List<Cliente> getListFiltro(String filter){
+		
+		filterList = new ArrayList<Cliente>();
+		
+		for(Cliente c : this.clientes){
+			if(c.getAluno().matches("(?i).*"+ filter + ".*")){
+				filterList.add(c);
+			}
+				
+		}
+		
+		return this.filterList;
+			
+	}
+	
 }

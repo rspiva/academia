@@ -2,6 +2,7 @@ package com.jpiva.aplicativo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,6 +44,8 @@ public class AcademiaLayout extends JFrame{
 	
 	JButton btnSalvar = new JButton("Salvar");
 	JButton btnImprimir = new JButton("Imprimir");
+	JButton btnBuscarCliente = new JButton("BuscarCliente");
+	
 	
 	// campos clientes
 	JLabel lAluno = new JLabel("Aluno:");
@@ -325,13 +328,16 @@ public class AcademiaLayout extends JFrame{
 		
 		painelControle.add(btnSalvar);
 		painelControle.add(btnImprimir);
+		painelControle.add(btnBuscarCliente);
 		btnImprimir.addActionListener(new ImprimirContrato());
 		btnSalvar.addActionListener(new SalvarContrato());
+		btnBuscarCliente.addActionListener(new BuscarCliente());
 		
 				
 		c.add(painelCliente, BorderLayout.NORTH);
 		c.add(painelContrato, BorderLayout.CENTER);
 		c.add(painelControle, BorderLayout.SOUTH);
+		
 		setSize(800,800);
 		setVisible(true);
 	
@@ -444,6 +450,24 @@ public class AcademiaLayout extends JFrame{
 			ic.setNome("contrato");
 			ic.setContrato(cto);
 			ic.imprimirContratoPdf();
+			
+		}
+    }
+	
+	class BuscarCliente implements ActionListener{
+		
+		public void actionPerformed(ActionEvent e){
+			
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						BuscaCliente2 frame = new BuscaCliente2();
+						frame.setVisible(true);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
 			
 		}
     }

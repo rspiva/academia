@@ -1,16 +1,20 @@
 package com.jpiva.controller;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.json.simple.JSONObject;
+import javax.swing.JOptionPane;
 
 import com.google.gson.Gson;
 import com.jpiva.model.Cliente;
@@ -21,7 +25,8 @@ public class ClienteController {
 	private List<Cliente> clientes;
 	
 	Gson gs = new Gson();
-	File arquivo = new File("cliente.json");
+	Path caminho;
+	Charset charset;
 	public List<Cliente> filterList;
 	
 	//leitura de dados com o FileReader e BufferedReader, estudar forma de ler dados com o
@@ -29,11 +34,12 @@ public class ClienteController {
 	public ClienteController(){
 		
 		clientes = new ArrayList<Cliente>();
-		FileReader fileR;
+		caminho = Paths.get("C:/academia/cliente.json");
+		charset = Charset.forName("ISO-8859-1");
+		
 		BufferedReader buffR;  
 		try {
-			fileR = new FileReader (arquivo);
-			buffR = new BufferedReader (fileR);
+			buffR = Files.newBufferedReader(caminho, charset);
 			String texto;  
         	while ((texto = buffR.readLine ()) != null ) {
         		Cliente cliente = gs.fromJson(texto, Cliente.class);
@@ -64,7 +70,7 @@ public class ClienteController {
 	}
 	
 	public void salvaCliente(Cliente cliente){
-		
+		BufferedWriter bw;
 		//Inserir o tratamento de quando houver o cliente atualiza
 		for( int i = 0; i < this.clientes.size(); i++){
 			if(cliente.equals(this.clientes.get(i))){
@@ -74,20 +80,21 @@ public class ClienteController {
 		this.clientes.add(cliente);
 		
 		try {
-			FileOutputStream fos = new FileOutputStream(arquivo);
+			bw = Files.newBufferedWriter(caminho, charset);
 			
 			for(Cliente c : this.clientes){
 				//adiciona na linha cada json
-				fos.write(gs.toJson(c).getBytes());
-				fos.write("\n".getBytes());
+				bw.write(gs.toJson(c));
+				bw.write("\n");
 			}
-			
-			fos.close();
-			
-			
+			bw.flush();
+			bw.close();
+			JOptionPane.showMessageDialog(null, "Registro salvo com sucesso");			
 		
 		}catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null,"Não foi encontrado o arquivo,\npara salvar o registro",
+					                           "Registro não foi Salvo", JOptionPane.ERROR_MESSAGE, null);	
 			e.printStackTrace();
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -106,6 +113,8 @@ public class ClienteController {
 			}
 				
 		}
+		
+		Collections.sort(filterList);
 		
 		return this.filterList;
 			

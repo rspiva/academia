@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,6 +25,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
+import com.ibm.icu.text.NumberFormat;
 import com.jpiva.controller.ClienteController;
 import com.jpiva.controller.ImprimeContrato;
 import com.jpiva.controller.MontarContrato;
@@ -34,6 +37,8 @@ public class AcademiaLayout extends JFrame{
 	
 	private JFrame frame = this;
 	ClienteController cc = new ClienteController();
+	Cliente c = new Cliente();
+	Contrato cto = new Contrato();
 	
 	JPanel painelCliente = new JPanel();
 	JPanel painelControle = new JPanel();
@@ -41,11 +46,13 @@ public class AcademiaLayout extends JFrame{
 	
 	ImprimeContrato ic = new ImprimeContrato();
 	MontarContrato mc = new MontarContrato();
+	BuscaCliente2 frameBusca = new BuscaCliente2();
+	
 	
 	JButton btnSalvar = new JButton("Salvar");
 	JButton btnImprimir = new JButton("Imprimir");
-	JButton btnBuscarCliente = new JButton("BuscarCliente");
-	
+	JButton btnBuscarCliente = new JButton("Buscar Cliente");
+	JButton btnAtualizar = new JButton("Atualizar");
 	
 	// campos clientes
 	JLabel lAluno = new JLabel("Aluno:");
@@ -77,9 +84,6 @@ public class AcademiaLayout extends JFrame{
 	
 	JLabel lFone2 = new JLabel("Fone2:");
 	JTextField txtFone2 = new JTextField("",8);
-	
-	JLabel lIdade = new JLabel("Idade:");
-	JTextField txtIdade = new JTextField("",8);
 	
 	JLabel lLocalNascimento = new JLabel("Local Nascimento:");
 	JTextField txtLocalNascimento = new JTextField("",20);
@@ -175,23 +179,10 @@ public class AcademiaLayout extends JFrame{
 		painelContrato.setLayout(new FlowLayout(FlowLayout.LEFT));
 		painelControle.setLayout(new FlowLayout(FlowLayout.CENTER));
 		
-		//valores de teste
-		txtAluno.setText("Rodrigo Sodré Piva Junior");
-		txtRepresentante.setText("Rodrigo Sodré Piva");
-		txtAltura.setText("1.79");
-		txtPeso.setText("087.5");
-		txtIdade.setText("30");
-		
-		txtValorParcela.setText("100.00");
-		txtDiaDePagto.setText("30");
-		txtDtNascimento.setText("28/05/1983");
-		txtLimiteAulas.setText("12");
-		txtLimiteSemanais.setText("3");
-		txtQtdMesesPlano.setText("12");
-		txtQtdParcela.setText("12");
 		
 		
 		
+	
 		lAluno.setLabelFor(txtAluno);
 		txtAluno.addFocusListener(painter);
 		painelCliente.add(lAluno);
@@ -235,11 +226,7 @@ public class AcademiaLayout extends JFrame{
 		txtFone2.addFocusListener(painter);
 		painelCliente.add(lFone2);
 		painelCliente.add(txtFone2);
-		
-		txtIdade.addFocusListener(painter);
-		painelCliente.add(lIdade);
-		painelCliente.add(txtIdade);
-		
+	
 		txtLocalNascimento.addFocusListener(painter);
 		painelCliente.add(lLocalNascimento);
 		painelCliente.add(txtLocalNascimento);
@@ -249,6 +236,7 @@ public class AcademiaLayout extends JFrame{
 		painelCliente.add(txtDtNascimento);
 		
 		txtPeso.addFocusListener(painter);
+		txtPeso.setFormatterFactory(MascaraMonetario("###.00")); 
 		painelCliente.add(lPeso);
 		painelCliente.add(txtPeso);
 		
@@ -313,26 +301,32 @@ public class AcademiaLayout extends JFrame{
 		painelContrato.add(lQtdParcela);
 		painelContrato.add(txtQtdParcela);
 		
+		
 		txtValorParcela.addFocusListener(painter);
 		txtValorParcela.setColumns(10);
 		txtValorParcela.setFormatterFactory(MascaraMonetario("#,###,###.00")); 
 		txtValorParcela.setHorizontalAlignment(JTextField.TRAILING);
 		
 		
-		
-		
 		painelContrato.add(lValorParcela);
 		painelContrato.add(txtValorParcela);
-		
-		
-		
 		painelControle.add(btnSalvar);
 		painelControle.add(btnImprimir);
 		painelControle.add(btnBuscarCliente);
+		painelControle.add(btnAtualizar);
 		btnImprimir.addActionListener(new ImprimirContrato());
 		btnSalvar.addActionListener(new SalvarContrato());
 		btnBuscarCliente.addActionListener(new BuscarCliente());
+		btnAtualizar.addActionListener(new Atualizar());
 		
+		txtValorParcela.setText("100");
+		txtDiaDePagto.setText("30");
+		txtDtNascimento.setText("28/05/1983");
+		txtLimiteAulas.setText("12");
+		txtLimiteSemanais.setText("3");
+		txtQtdMesesPlano.setText("12");
+		txtQtdParcela.setText("12");
+	
 				
 		c.add(painelCliente, BorderLayout.NORTH);
 		c.add(painelContrato, BorderLayout.CENTER);
@@ -344,10 +338,44 @@ public class AcademiaLayout extends JFrame{
 		
 	}
 	
+	public void preencherFormularioCliente(Cliente cs){
+		if( cs != null){
+			txtAluno.setText(cs.getAluno());
+			txtRepresentante.setText(cs.getRepresentante());
+			txtEndereco.setText(cs.getEndereco());
+			txtNumero.setText(cs.getNumero());
+			txtComplemento.setText(cs.getComplemento());
+			txtBairro.setText(cs.getBairro());
+			txtCidade.setText(cs.getCidade());
+			txtCep.setText(cs.getCep());
+			txtFone1.setText(cs.getFone1());
+			txtFone2.setText(cs.getFone2());
+			txtLocalNascimento.setText(cs.getLocalNascimento());
+			
+			SimpleDateFormat sdf1= new SimpleDateFormat("dd/MM/yyyy");
+			txtDtNascimento.setText(sdf1.format(cs.getDtNascimento()));
+			
+			
+			DecimalFormat df = new DecimalFormat("0.##");
+			txtPeso.setText(df.format(cs.getPeso()));
+			
+			txtAltura.setText(String.valueOf(cs.getAltura()));
+			txtEscolaridade.setText(cs.getEscolaridade());
+			txtProfissao.setText(cs.getProfissao());
+			txtLocalTrabalho.setText(cs.getLocalTrabalho());
+			txtEnderecoTrab.setText(cs.getEnderecoTrabalho());
+			txtNumeroTrab.setText(cs.getNumeroTrabalho());
+			txtRg.setText(cs.getRg());
+			txtCpf.setText(cs.getCpf());
+			txtPai.setText(cs.getNomePai());
+			txtMae.setText(cs.getNomeMae());
+		}
+		
+	}
+	
 	private Contrato lerFormulario(){
 		
-		Cliente c = new Cliente();
-		Contrato cto = new Contrato();
+		
 		c.setAluno(txtAluno.getText());
 		c.setRepresentante(txtRepresentante.getText());
 		c.setEndereco(txtEndereco.getText());
@@ -358,7 +386,6 @@ public class AcademiaLayout extends JFrame{
 		c.setCep(txtCep.getText());
 		c.setFone1(txtFone1.getText());
 		c.setFone2(txtFone2.getText());
-		c.setIdade(Integer.parseInt(txtIdade.getText()));
 		c.setLocalNascimento(txtLocalNascimento.getText());
 					
 		SimpleDateFormat sdf1= new SimpleDateFormat("dd/MM/yyyy");
@@ -368,7 +395,11 @@ public class AcademiaLayout extends JFrame{
 			JOptionPane.showMessageDialog(null, "Data esta incorreta");
 			e1.printStackTrace();
 		}
-		c.setPeso(Double.parseDouble(txtPeso.getText()));
+		
+		String peso = txtPeso.getText().replace(",", ".");		
+		c.setPeso(Double.parseDouble(peso));
+		
+		
 		c.setAltura(Double.parseDouble(txtAltura.getText()));
 		c.setEscolaridade(txtEscolaridade.getText());
 		c.setProfissao(txtProfissao.getText());
@@ -379,7 +410,7 @@ public class AcademiaLayout extends JFrame{
 		c.setCpf(txtCpf.getText());
 		c.setNomePai(txtPai.getText());
 		c.setNomeMae(txtMae.getText());
-		
+				
 		//campos do contrato
 		cto.setCliente(c);
 		cto.setLimiteDeAulas(Integer.parseInt(txtLimiteAulas.getText()));
@@ -388,13 +419,18 @@ public class AcademiaLayout extends JFrame{
 		cto.setQtdMesesPlano(Integer.parseInt(txtQtdMesesPlano.getText()));
 		cto.setQtdParcela(Integer.parseInt(txtQtdParcela.getText()));
 		cto.setValorParcela(new BigDecimal(0.0));
-					
-		return cto;
 		
+		Calendar cData = Calendar.getInstance();  
+        Calendar cHoje= Calendar.getInstance();  
+        cData.setTime(c.getDtNascimento());  
+        cData.set(Calendar.YEAR, cHoje.get(Calendar.YEAR));  
+        int idade = cData.after(cHoje) ? -1 : 0;  
+        cData.setTime(c.getDtNascimento());
+        idade += cHoje.get(Calendar.YEAR) - cData.get(Calendar.YEAR);  
+        c.setIdade(idade);
+        return cto;		
 	}
-		
-	   
-    
+	    
     public MaskFormatter Mascara(String Mascara){  
         
         MaskFormatter F_Mascara = new MaskFormatter();  
@@ -432,11 +468,14 @@ public class AcademiaLayout extends JFrame{
 		
 		public void actionPerformed(ActionEvent e){
 			
-			Contrato cto = new Contrato();
-			cto = lerFormulario();
-			cc.salvaCliente(cto.getCliente());
-			
-			
+			if(txtCpf.getText().equals("___.___.___-__") || txtAluno.getText().equals("")){
+				JOptionPane.showMessageDialog(null,"Não há CPF ou nome do Aluno",
+                        "Registro não foi Salvo", JOptionPane.ERROR_MESSAGE, null);	
+			}else{
+				Contrato cto = new Contrato();
+				cto = lerFormulario();
+				cc.salvaCliente(cto.getCliente());
+			}
 		}
     }
     
@@ -454,6 +493,26 @@ public class AcademiaLayout extends JFrame{
 		}
     }
 	
+	class Atualizar implements ActionListener{
+		
+		public void actionPerformed(ActionEvent e){
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						
+						
+						c = frameBusca.getClienteSelecionado();
+						preencherFormularioCliente(c);
+						
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});			
+		}
+    }
+	
 	class BuscarCliente implements ActionListener{
 		
 		public void actionPerformed(ActionEvent e){
@@ -461,8 +520,10 @@ public class AcademiaLayout extends JFrame{
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-						BuscaCliente2 frame = new BuscaCliente2();
-						frame.setVisible(true);
+						frameBusca.setVisible(true);
+						frameBusca.abrirBuscaCliente2();
+						//Cliente cliente = frame.getClienteSelecionado();
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -470,6 +531,5 @@ public class AcademiaLayout extends JFrame{
 			});
 			
 		}
-    }
-    
+    }    
 }

@@ -1,0 +1,9 @@
+Inserir o e-mail, 
+          Treinou Antes, 
+          Onde?, 
+          email do trabalho 
+          Est.Civil:
+          bairro
+          cidade
+          fone trabalho
+          email trabalho

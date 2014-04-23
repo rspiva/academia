@@ -2,7 +2,7 @@ package com.jpiva.model;
 
 import java.util.Date;
 
-public class Cliente {
+public class Cliente implements Comparable<Cliente>{
 	
 	String 	aluno, 
 			representante, 
@@ -239,6 +239,12 @@ public class Cliente {
 		} else if (!cpf.equals(other.cpf))
 			return false;
 		return true;
+	}
+	@Override
+	public int compareTo(Cliente other) {
+		// TODO Auto-generated method stub
+		return this.aluno.compareTo(other.getAluno());
+		
 	}
 	
 	

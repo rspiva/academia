@@ -34,10 +34,17 @@ public class BuscaCliente2 extends JFrame {
 	private JTextField txtNome;
 	private JTable tableCliente;
 	private TableCliente tableModel;
+	List<Cliente> lc;
+	private Cliente cliente;
+	private int index;
 
 	/**
 	 * Launch the application.
 	 */
+	public BuscaCliente2() {
+		super("Buscar Aluno");
+	}
+	
 	/*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -55,8 +62,8 @@ public class BuscaCliente2 extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public BuscaCliente2() {
-		super("Busca Aluno");
+	public void abrirBuscaCliente2() {
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -108,12 +115,27 @@ public class BuscaCliente2 extends JFrame {
 		tableCliente.getSelectionModel().addListSelectionListener(new ListSelectionListener() {  
 	         
 	        public void valueChanged(ListSelectionEvent e) {  
-	             System.out.println(tableCliente.getSelectedRow());
+	             //System.out.println(tableCliente.getSelectedRow());
+	        	 index = tableCliente.getSelectedRow();
+	        	 cliente = (Cliente) lc.get(index);
+	        	 dispose();
+	        	 JOptionPane.showMessageDialog(null, "Aluno: " + cliente.getAluno()+ " carregado\nPressione o botão atualizar");
+	        	   //feichar frame
 	        }
 			
 	     });  
 		
 	}
+	
+	public Cliente getClienteSelecionado(){
+		if(lc == null){
+			return null;
+		}
+		cliente = (Cliente) lc.get(index);
+		return this.cliente;
+		
+	}
+	
 	
 	private JTable getTableCliente() {
         if (tableCliente == null) {
@@ -136,8 +158,10 @@ public class BuscaCliente2 extends JFrame {
     class FiltrarCliente implements ActionListener{
 		
 		public void actionPerformed(ActionEvent e){
+			if(lc != null)
+				lc.clear();
 			
-			List<Cliente> lc = new ClienteController().getListFiltro(txtNome.getText());			
+			lc = new ClienteController().getListFiltro(txtNome.getText());			
 		    //System.out.println(lc);
 		    tableModel.setLinhas(lc);
 		    tableCliente.updateUI();

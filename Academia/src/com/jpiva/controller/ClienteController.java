@@ -89,7 +89,7 @@ public class ClienteController {
 			}
 			bw.flush();
 			bw.close();
-			JOptionPane.showMessageDialog(null, "Registro salvo com sucesso");			
+			//JOptionPane.showMessageDialog(null, "Registro salvo com sucesso");			
 		
 		}catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

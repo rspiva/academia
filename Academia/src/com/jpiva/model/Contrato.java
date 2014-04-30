@@ -1,12 +1,11 @@
 package com.jpiva.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class Contrato {
 	
 	int limiteDeAulas, limiteDeAulasSemanais, diaDePagto, qtdMesesPlano, qtdParcela;
-	BigDecimal valorParcela;
+	double valorParcela;
 	List diasDaSemana;
 	Cliente cliente;
 	
@@ -41,10 +40,10 @@ public class Contrato {
 	public void setQtdParcela(int qtdParcela) {
 		this.qtdParcela = qtdParcela;
 	}
-	public BigDecimal getValorParcela() {
+	public double getValorParcela() {
 		return valorParcela;
 	}
-	public void setValorParcela(BigDecimal valorParcela) {
+	public void setValorParcela(double valorParcela) {
 		this.valorParcela = valorParcela;
 	}
 	public List getDiasDaSemana() {

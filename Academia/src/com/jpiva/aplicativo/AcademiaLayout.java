@@ -4,29 +4,38 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
-import com.ibm.icu.text.NumberFormat;
 import com.jpiva.controller.ClienteController;
+import com.jpiva.controller.ContratoController;
 import com.jpiva.controller.ImprimeContrato;
 import com.jpiva.controller.MontarContrato;
 import com.jpiva.model.Cliente;
@@ -37,12 +46,27 @@ public class AcademiaLayout extends JFrame{
 	
 	private JFrame frame = this;
 	ClienteController cc = new ClienteController();
+	ContratoController ccto = new ContratoController();
 	Cliente c = new Cliente();
 	Contrato cto = new Contrato();
 	
+	String arquivoSelecionado = "";
+	
+	JMenuBar menuBar;
+	JMenu menuSistema;
+	JMenu menuImpressao;
+	JMenuItem salvar;
+	JMenuItem abrir;
+	JMenuItem novo;
+	JMenuItem impressao;
+	
+	
+	
+	JPanel painelInformacoes = new JPanel();
 	JPanel painelCliente = new JPanel();
 	JPanel painelControle = new JPanel();
 	JPanel painelContrato = new JPanel();
+	
 	
 	ImprimeContrato ic = new ImprimeContrato();
 	MontarContrato mc = new MontarContrato();
@@ -144,6 +168,7 @@ public class AcademiaLayout extends JFrame{
 	JLabel lValorParcela = new JLabel("Valor:");
 	JFormattedTextField txtValorParcela = new JFormattedTextField();
             
+	JLabel lPathArquivo = new JLabel("");
 	
 	FocusListener painter = new FocusListener() {  
 	    @Override  
@@ -172,16 +197,33 @@ public class AcademiaLayout extends JFrame{
 		Container c = getContentPane();
 		
 		//cliente
-		
+		painelInformacoes.setLayout(new FlowLayout(FlowLayout.LEFT));
 		//painelCliente.setLayout(new FlowLayout(FlowLayout.LEFT));
 		painelCliente.setLayout(new GridLayout(24,2,2,2));
 		//painelContrato.setLayout(new GridLayout(6,2,2,2));
-		painelContrato.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		painelContrato.setLayout(new GridLayout(24,2,2,2));
 		painelControle.setLayout(new FlowLayout(FlowLayout.CENTER));
+		painelInformacoes.setSize(c.getSize());
 		
+		//arquivo
 		
+		salvar 		= new JMenuItem("Salvar");
+		abrir 		= new JMenuItem("Abrir");
+		novo 		= new JMenuItem("Novo");
+		impressao 	= new JMenuItem("Imprimir");
 		
+	    menuBar = new JMenuBar();  
+        menuSistema = new JMenu("Arquivo");  
+        menuSistema.add(novo);  
+        menuSistema.add(abrir);
+        menuSistema.add(salvar);
+        menuImpressao = new JMenu("Impressão");
+        menuImpressao.add(impressao);
+        menuBar.add(menuSistema);
+        menuBar.add(menuImpressao);
 		
+		c.add(menuBar, BorderLayout.NORTH);
 	
 		lAluno.setLabelFor(txtAluno);
 		txtAluno.addFocusListener(painter);
@@ -282,22 +324,27 @@ public class AcademiaLayout extends JFrame{
 		
 		//contrato
 		txtLimiteAulas.addFocusListener(painter);
+		txtLimiteAulas.setHorizontalAlignment(JTextField.TRAILING);
 		painelContrato.add(lLimiteAulas);
 		painelContrato.add(txtLimiteAulas);
 		
 		txtLimiteSemanais.addFocusListener(painter);
+		txtLimiteSemanais.setHorizontalAlignment(JTextField.TRAILING);
 		painelContrato.add(lLimiteAulasSemanais);
 		painelContrato.add(txtLimiteSemanais);
 		
 		txtDiaDePagto.addFocusListener(painter);
+		txtDiaDePagto.setHorizontalAlignment(JTextField.TRAILING);
 		painelContrato.add(lDiaDePagto);
 		painelContrato.add(txtDiaDePagto);
 		
 		txtQtdMesesPlano.addFocusListener(painter);
+		txtQtdMesesPlano.setHorizontalAlignment(JTextField.TRAILING);
 		painelContrato.add(lQtdMesesPlano);
 		painelContrato.add(txtQtdMesesPlano);
 		
 		txtQtdParcela.addFocusListener(painter);
+		txtQtdParcela.setHorizontalAlignment(JTextField.TRAILING);
 		painelContrato.add(lQtdParcela);
 		painelContrato.add(txtQtdParcela);
 		
@@ -308,29 +355,45 @@ public class AcademiaLayout extends JFrame{
 		txtValorParcela.setHorizontalAlignment(JTextField.TRAILING);
 		
 		
+		
 		painelContrato.add(lValorParcela);
 		painelContrato.add(txtValorParcela);
-		painelControle.add(btnSalvar);
-		painelControle.add(btnImprimir);
 		painelControle.add(btnBuscarCliente);
 		painelControle.add(btnAtualizar);
-		btnImprimir.addActionListener(new ImprimirContrato());
-		btnSalvar.addActionListener(new SalvarContrato());
+	    
+		impressao.addActionListener(new ImprimirContrato());
+		salvar.addActionListener(new SalvarContrato());
+		abrir.addActionListener(new AbrirContrato());
+		
 		btnBuscarCliente.addActionListener(new BuscarCliente());
 		btnAtualizar.addActionListener(new Atualizar());
 		
+		/*
 		txtValorParcela.setText("100");
 		txtDiaDePagto.setText("30");
-		txtDtNascimento.setText("28/05/1983");
 		txtLimiteAulas.setText("12");
 		txtLimiteSemanais.setText("3");
 		txtQtdMesesPlano.setText("12");
 		txtQtdParcela.setText("12");
-	
-				
-		c.add(painelCliente, BorderLayout.NORTH);
-		c.add(painelContrato, BorderLayout.CENTER);
-		c.add(painelControle, BorderLayout.SOUTH);
+	    */
+		
+		painelContrato.setSize(500, 200);
+		
+		painelCliente.setBorder(BorderFactory.createCompoundBorder(
+				 BorderFactory.createTitledBorder("Informações do Cliente"), 
+				 BorderFactory.createEmptyBorder(5,5,5,5)));
+		
+		painelContrato.setBorder(BorderFactory.createCompoundBorder(
+				 BorderFactory.createTitledBorder("Condições do Contrato"), 
+				 BorderFactory.createEmptyBorder(5,5,5,5)));
+		
+		
+		painelInformacoes.add(painelCliente);
+		painelInformacoes.add(painelContrato);
+		painelInformacoes.add(lPathArquivo);
+		
+		c.add(painelInformacoes, BorderLayout.CENTER);
+		c.add(painelControle, BorderLayout.PAGE_END);
 		
 		setSize(800,800);
 		setVisible(true);
@@ -369,6 +432,24 @@ public class AcademiaLayout extends JFrame{
 			txtCpf.setText(cs.getCpf());
 			txtPai.setText(cs.getNomePai());
 			txtMae.setText(cs.getNomeMae());
+		}
+		
+	}
+	
+	public void preecherFormularioContrato(Contrato ctos){
+		if( ctos != null){
+			txtLimiteAulas.setText(String.valueOf(ctos.getLimiteDeAulas()));
+			txtLimiteSemanais.setText(String.valueOf(ctos.getLimiteDeAulasSemanais()));
+			txtDiaDePagto.setText(String.valueOf(ctos.getDiaDePagto()));
+			txtQtdMesesPlano.setText(String.valueOf(ctos.getQtdMesesPlano()));
+			txtQtdParcela.setText(String.valueOf(ctos.getQtdParcela()));
+			
+			NumberFormat nf = NumberFormat.getInstance();
+			System.out.println(nf.format(ctos.getValorParcela()));
+			txtValorParcela.setText(nf.format(ctos.getValorParcela()));
+			
+			
+			
 		}
 		
 	}
@@ -418,7 +499,14 @@ public class AcademiaLayout extends JFrame{
 		cto.setDiaDePagto(Integer.parseInt(txtDiaDePagto.getText()));
 		cto.setQtdMesesPlano(Integer.parseInt(txtQtdMesesPlano.getText()));
 		cto.setQtdParcela(Integer.parseInt(txtQtdParcela.getText()));
-		cto.setValorParcela(new BigDecimal(0.0));
+		
+		NumberFormat nf = NumberFormat.getInstance();
+		try {
+			cto.setValorParcela(nf.parse(txtValorParcela.getText()).doubleValue());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Calendar cData = Calendar.getInstance();  
         Calendar cHoje= Calendar.getInstance();  
@@ -475,6 +563,7 @@ public class AcademiaLayout extends JFrame{
 				Contrato cto = new Contrato();
 				cto = lerFormulario();
 				cc.salvaCliente(cto.getCliente());
+				ccto.salvarContrato(cto, arquivoSelecionado);
 			}
 		}
     }
@@ -512,6 +601,31 @@ public class AcademiaLayout extends JFrame{
 			});			
 		}
     }
+	
+	class AbrirContrato implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			JFileChooser fileChooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Arquivo JSON ","json", "json");
+			fileChooser.setFileFilter(filter);
+			int opcao = fileChooser.showOpenDialog(frame);
+			
+			
+			if(opcao == JFileChooser.APPROVE_OPTION){
+				arquivoSelecionado=fileChooser.getSelectedFile().getAbsolutePath();
+				lPathArquivo.setText(arquivoSelecionado);
+				Contrato ctosel = ccto.getContrato(arquivoSelecionado);
+				preencherFormularioCliente(ctosel.getCliente());
+				preecherFormularioContrato(ctosel);
+				
+			}else if(opcao == JFileChooser.CANCEL_OPTION){
+								
+			}
+		}
+		
+	}
 	
 	class BuscarCliente implements ActionListener{
 		
